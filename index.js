@@ -29,7 +29,24 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 const User = require("./src/models/user");
 const Session = require("./src/models/session");
 
+// Create user
+app.post("/api/users", function(req, res) {
+  let userName = req.body.username;
+  if (!userName) {
+    res.json({ error: "insert a username" });
+  } else {
+    // inser username in db
+    let user = new User({ username: userName });
+    user.save().then(data => {
+      if (!data) {
+        console.log("error: record not saved!");
+      } else {
+        res.json({ "username": data["username"] });
+      }
+    });
+  }
+});
 
 const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
-})
+  console.log('Your app is listening on port ' + listener.address().port);
+});
