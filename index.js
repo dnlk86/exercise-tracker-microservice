@@ -11,6 +11,10 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+// Body-parser middleware
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
 // Mongo db connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true, dbName: "exercise-tracker" })
   .then(() => {
@@ -21,9 +25,9 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     console.log(err);
   });
 
-// Body-parser middleware
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
+// Models import
+const User = require("./src/models/user");
+const Session = require("./src/models/session");
 
 
 const listener = app.listen(process.env.PORT || 3000, () => {
