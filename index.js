@@ -73,26 +73,13 @@ app.post("/api/users/:_id/exercises", function (req, res) {
     let description = request["description"];
     let duration = request["duration"];
     let date = new Date(request["date"]);
-    // res.json({
-    //     id: id,
-    //     description: description,
-    //     duration: duration,
-    //     date: date.toDateString(),
-    // });
-
-    // check if all fields are completed
-    if (!id || !description || !duration || !date) {
-        console.log("error: please fill all the fields before submitting!");
-        return;
-    }
 
     // check if _id exists in db
-    User.findOne({ _id: id }).then((user) => {
-        if (!user) {
-            console.log("error: user does not exist!");
-            return;
-        }
-    });
+    try {
+        User.findById(id).then((data) => console.log(data));
+    } catch (err) {
+        console.log(err);
+    }
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
