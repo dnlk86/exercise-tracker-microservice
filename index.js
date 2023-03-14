@@ -71,8 +71,9 @@ app.post("/api/users/:_id/exercises", function (req, res) {
     console.log(request);
 
     // check if _id is valid
+    var _id = request[":_id"];
     try {
-        var id = new mongoose.mongo.ObjectId(request[":_id"]);
+        var id = new mongoose.mongo.ObjectId(_id);
     } catch (err) {
         console.log("error: _id not valid!");
         return;
@@ -84,9 +85,23 @@ app.post("/api/users/:_id/exercises", function (req, res) {
     // retrieve user data
     User.findById(id).then((data) => {
         if (!data) {
-            console.log("error: data not found!");
+            console.log("error: user not found!");
         } else {
             console.log(data);
+            // insert data into sessions collection
+            let session = new Session({
+                user_id: _id,
+                description: description,
+                duration: duration,
+                date: date,
+            });
+            session.save().then((data) => {
+                if (!data) {
+                    console.log("error: session not saved!");
+                } else {
+                    res.json(data);
+                }
+            });
         }
     });
 });
