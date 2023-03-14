@@ -34,6 +34,17 @@ mongoose
 const User = require("./src/models/user");
 const Session = require("./src/models/session");
 
+// Get all users
+app.get("/api/users", function (req, res) {
+    User.find({}, "_id username").then((data) => {
+        if (!data) {
+            console.log("No users in the database.");
+        } else {
+            res.json(data);
+        }
+    });
+});
+
 // Create user
 app.post("/api/users", function (req, res) {
     let userName = req.body.username;
