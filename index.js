@@ -67,19 +67,28 @@ app.post("/api/users", function (req, res) {
 
 // Create session
 app.post("/api/users/:_id/exercises", function (req, res) {
-    let request = req.body;
-    // console.log(request);
-    let id = request[":_id"];
-    let description = request["description"];
-    let duration = request["duration"];
-    let date = new Date(request["date"]);
+    var request = req.body;
+    console.log(request);
 
-    // check if _id exists in db
+    // check if _id is valid
     try {
-        User.findById(id).then((data) => console.log(data));
+        var id = new mongoose.mongo.ObjectId(request[":_id"]);
     } catch (err) {
-        console.log(err);
+        console.log("error: _id not valid!");
+        return;
     }
+    var description = request["description"];
+    var duration = request["duration"];
+    var date = new Date(request["date"]);
+
+    // retrieve user data
+    User.findById(id).then((data) => {
+        if (!data) {
+            console.log("error: data not found!");
+        } else {
+            console.log(data);
+        }
+    });
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
