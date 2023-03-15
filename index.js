@@ -31,8 +31,8 @@ mongoose
     });
 
 // Models import
-const User = require("./src/models/user");
-const Session = require("./src/models/session");
+let User = require("./src/models/user");
+let Session = require("./src/models/session");
 
 // Get all users
 app.get("/api/users", function (req, res) {
@@ -54,11 +54,11 @@ app.post("/api/users", function (req, res) {
         // check if username already exist in db
         User.findOne({ username: userName }).then((retrievedUser) => {
             if (!retrievedUser) {
-                // insert username in db
+                // inser username in db
                 let user = new User({ username: userName });
                 user.save().then((data) => {
                     if (!data) {
-                        console.log("error: record not saved!");
+                        console.log("error: user not saved!");
                     } else {
                         res.json({
                             username: data["username"],
@@ -91,26 +91,40 @@ app.post("/api/users/:_id/exercises", function (req, res) {
     }
     var description = request["description"];
     var duration = request["duration"];
-    var date = new Date(request["date"]);
+    // in case no date is provided by the user set date to now
+    var date = new Date();
+    // check if user provides a date
+    if (request["date"] !== "") {
+        date = new Date(request["date"]);
+        console.log(date);
+    }
 
     // retrieve user data
-    User.findById(id).then((data) => {
+    console.log("_id", id);
+    User.findById(_id).then((data) => {
         if (!data) {
             console.log("error: user not found!");
         } else {
-            console.log(data);
             // insert data into sessions collection
+            var username = data.username;
+
             let session = new Session({
                 user_id: _id,
                 description: description,
                 duration: duration,
-                date: date,
+                date: date.toDateString(),
             });
             session.save().then((data) => {
                 if (!data) {
                     console.log("error: session not saved!");
                 } else {
-                    res.json(data);
+                    res.json({
+                        username: username,
+                        description: data.description,
+                        duration: data.duration,
+                        date: data.date,
+                        _id: data._id,
+                    });
                 }
             });
         }
