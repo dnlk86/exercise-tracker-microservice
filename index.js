@@ -79,12 +79,10 @@ app.post("/api/users", function (req, res) {
 // Create session
 app.post("/api/users/:_id/exercises", function (req, res) {
     var request = req.body;
-    console.log(request);
-
     // check if _id is valid
-    var _id = request[":_id"];
+    var _id = req.params["_id"];
     try {
-        var id = new mongoose.mongo.ObjectId(_id);
+        var id = new mongoose.Types.ObjectId(_id);
     } catch (err) {
         console.log("error: _id not valid!");
         return;
@@ -96,34 +94,30 @@ app.post("/api/users/:_id/exercises", function (req, res) {
     // check if user provides a date
     if (request["date"] !== "") {
         date = new Date(request["date"]);
-        console.log(date);
     }
 
     // retrieve user data
-    console.log("_id", id);
-    User.findById(_id).then((data) => {
-        if (!data) {
+    User.findById(_id).then((user) => {
+        if (!user) {
             console.log("error: user not found!");
         } else {
             // insert data into sessions collection
-            var username = data.username;
-
-            let session = new Session({
+            let exSession = new Session({
                 user_id: _id,
                 description: description,
                 duration: duration,
                 date: date.toDateString(),
             });
-            session.save().then((data) => {
-                if (!data) {
-                    console.log("error: session not saved!");
+            exSession.save().then((exercise) => {
+                if (!exercise) {
+                    console.log("error: exercise session not saved!");
                 } else {
                     res.json({
-                        username: username,
-                        description: data.description,
-                        duration: data.duration,
-                        date: data.date,
-                        _id: data._id,
+                        _id: user._id,
+                        username: user.username,
+                        date: exercise.date,
+                        duration: exercise.duration,
+                        description: exercise.description,
                     });
                 }
             });
