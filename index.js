@@ -45,6 +45,35 @@ app.get("/api/users", function (req, res) {
     });
 });
 
+// Get user's exercise log
+app.get("/api/users/:_id/logs", function (req, res) {
+    // console.log(req.params);
+    // console.log(req.query);
+
+    User.findById(req.params["_id"], "_id username").then((user) => {
+        if (!user) {
+            console.log("error: user not found!");
+        } else {
+            Session.find(
+                { user_id: req.params["_id"] },
+                "description duration date"
+            ).then((sessions) => {
+                let newSessions = sessions.map((exer) => ({
+                    description: exer.description,
+                    duration: exer.duration,
+                    date: exer.date,
+                }));
+                res.json({
+                    _id: user._id,
+                    username: user.username,
+                    count: newSessions.length,
+                    log: newSessions,
+                });
+            });
+        }
+    });
+});
+
 // Create user
 app.post("/api/users", function (req, res) {
     let userName = req.body.username;
