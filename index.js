@@ -47,9 +47,6 @@ app.get("/api/users", function (req, res) {
 
 // Get user's exercise log
 app.get("/api/users/:_id/logs", function (req, res) {
-    // console.log(req.params);
-    // console.log(req.query);
-
     User.findById(req.params["_id"], "_id username").then((user) => {
         if (!user) {
             console.log("error: user not found!");
@@ -60,40 +57,37 @@ app.get("/api/users/:_id/logs", function (req, res) {
             ).then((sessions) => {
                 // filters
                 const { from, to, limit } = req.query;
-                // console.log(limit, from, to);
 
-                let newSessions = sessions.map((exer) => ({
+                let nSessions = sessions.map((exer) => ({
                     description: exer.description,
                     duration: exer.duration,
                     date: exer.date,
                 }));
 
-                // applying limit filter
-                if (limit) {
-                    newSessions = newSessions.slice(0, limit);
-                }
-
+                let fSessions = nSessions;
                 // applying from filter
                 if (from) {
-                    newSessions = newSessions.filter(
+                    fSessions = fSessions.filter(
                         (v) => Date.parse(v.date) >= Date.parse(from)
                     );
                 }
 
                 // applying to filter
                 if (to) {
-                    newSessions = newSessions.filter(
+                    fSessions = fSessions.filter(
                         (v) => Date.parse(v.date) <= Date.parse(to)
                     );
                 }
-
-                // console.log(newSessions);
+                // applying limit filter
+                if (limit) {
+                    fSessions = fSessions.slice(0, limit);
+                }
 
                 res.json({
                     _id: user._id,
                     username: user.username,
-                    count: newSessions.length,
-                    log: newSessions,
+                    count: nSessions.length,
+                    log: fSessions,
                 });
             });
         }
