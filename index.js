@@ -58,11 +58,38 @@ app.get("/api/users/:_id/logs", function (req, res) {
                 { user_id: req.params["_id"] },
                 "description duration date"
             ).then((sessions) => {
+                // filters
+                const { from, to, limit } = req.query;
+
                 let newSessions = sessions.map((exer) => ({
                     description: exer.description,
                     duration: exer.duration,
                     date: exer.date,
                 }));
+
+                console.log(limit, from, to);
+
+                // applying limit filter
+                // if (limit) {
+                newSessions = newSessions.slice(0, limit);
+                // }
+
+                // applying from filter
+                if (from) {
+                    newSessions = newSessions.filter(
+                        (v) => Date.parse(v.date) >= Date.parse(from)
+                    );
+                }
+
+                // applying to filter
+                if (to) {
+                    newSessions = newSessions.filter(
+                        (v) => Date.parse(v.date) <= Date.parse(to)
+                    );
+                }
+
+                console.log(newSessions);
+
                 res.json({
                     _id: user._id,
                     username: user.username,
