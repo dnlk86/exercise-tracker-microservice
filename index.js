@@ -60,6 +60,7 @@ app.get("/api/users/:_id/logs", function (req, res) {
             ).then((sessions) => {
                 // filters
                 const { from, to, limit } = req.query;
+                // console.log(limit, from, to);
 
                 let newSessions = sessions.map((exer) => ({
                     description: exer.description,
@@ -67,12 +68,10 @@ app.get("/api/users/:_id/logs", function (req, res) {
                     date: exer.date,
                 }));
 
-                console.log(limit, from, to);
-
                 // applying limit filter
-                // if (limit) {
-                newSessions = newSessions.slice(0, limit);
-                // }
+                if (limit) {
+                    newSessions = newSessions.slice(0, limit);
+                }
 
                 // applying from filter
                 if (from) {
@@ -88,7 +87,7 @@ app.get("/api/users/:_id/logs", function (req, res) {
                     );
                 }
 
-                console.log(newSessions);
+                // console.log(newSessions);
 
                 res.json({
                     _id: user._id,
@@ -148,8 +147,12 @@ app.post("/api/users/:_id/exercises", function (req, res) {
     // in case no date is provided by the user set date to now
     var date = new Date();
     // check if user provides a date
-    if (request["date"] !== "") {
-        date = new Date(request["date"]);
+    if (request["date"] !== undefined) {
+        try {
+            date = new Date(request["date"]);
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     // retrieve user data
